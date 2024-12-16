@@ -5,6 +5,12 @@ import (
 	"fmt"
 )
 
+var (
+	red   = "\033[31m"
+	green = "\033[32m"
+	reset = "\033[0m"
+)
+
 func MotdDisp(wordList, targetURL string, workers, expiration int, quiet bool) {
 	fmt.Printf("Starting MyGB\n\n")
 	fmt.Println("---")
@@ -26,7 +32,11 @@ func EndDisp(t *Timer) {
 }
 
 func HTTPDisp(word string, code int) {
-	fmt.Printf("/%-15s %d\n", word, code)
+	if code == 200 {
+		fmt.Printf(green+"/%-15s %d\n"+reset, word, code)
+	} else {
+		fmt.Printf(red+"/%-15s %d\n"+reset, word, code)
+	}
 }
 
 func HTTPErr(word string, err error) {
