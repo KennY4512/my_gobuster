@@ -8,47 +8,62 @@ import (
 	"time"
 )
 
-func Worker(wordList, targetURL string, workers, expiration int, quiet bool) {
+// Function that pperforms the work
+func worker(wordList, targetURL string, workers, expiration int, quiet, csv bool) {
 	var wg sync.WaitGroup
+	var c basics.CSV // CSV object to handle CSV creation if needed
 
+	// Defines the timeout for HTTP client
 	client := &http.Client{
 		Timeout: time.Duration(expiration) * time.Second,
 	}
 
+	// Semaphore to limit the number of concurrent workers
 	sem := make(chan struct{}, workers)
+
+	// Initalize a scanner with the wordlist
 	scanner := bufio.NewScanner(basics.FileOpener(wordList))
 
+	// Loop through each line in the word list
 	for scanner.Scan() {
-		value := scanner.Text()
+		curWord := scanner.Text()
 		wg.Add(1)
-		sem <- struct{}{}
+		sem <- struct{}{} // Acquire a semaphore slot
 
-		go func(val string) {
+		// Launch a goroutine to handle the HTTP request
+		go func(word string) {
 			defer wg.Done()
-			defer func() { <-sem }()
+			defer func() { <-sem }() // Release the semaphore slot
 
-			resp, err := client.Get(targetURL + val)
-
+			// Send a GET request to the target URL
+			resp, err := client.Get(targetURL + word)
 			if err != nil {
-				basics.HTTPErr(val, err)
+				basics.HTTPErr(word, err)
 				return
 			}
-
 			defer resp.Body.Close()
 
-			if quiet {
-				if resp.StatusCode == 200 {
-					basics.HTTPDisp(val, resp.StatusCode)
-				}
-			} else {
-				basics.HTTPDisp(val, resp.StatusCode)
+			// Controls how the result is displayed and put the result in a slice (for CSV)
+			if quiet && resp.StatusCode == 200 {
+				basics.HTTPDisp(word, resp.StatusCode)
+				c.Add(word, resp.StatusCode)
+			} else if !quiet {
+				basics.HTTPDisp(word, resp.StatusCode)
+				c.Add(word, resp.StatusCode)
 			}
-		}(value)
+
+		}(curWord) // Pass the current word to the goroutine
 	}
 
+	// Check for any errors encountered while scanning the file
 	if err := scanner.Err(); err != nil {
-		basics.ReadingErr(err)
+		basics.FileReadErr(err)
 	}
 
 	wg.Wait()
+
+	// If the csv flag is true, write the results to a CSV file
+	if csv {
+		c.Write()
+	}
 }

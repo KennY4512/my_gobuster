@@ -6,7 +6,8 @@ import (
 	"strings"
 )
 
-func FlagsManager() (d, t string, w, e int, q bool) {
+// Handles flags
+func FlagsManager() (d, t string, w, e int, q, csv bool) {
 	var wordList, targetURL string
 	var workers, expiration int
 	var quiet, help, clear bool
@@ -16,6 +17,7 @@ func FlagsManager() (d, t string, w, e int, q bool) {
 	flag.IntVar(&workers, "w", 1, "Number of workers to run")
 	flag.IntVar(&expiration, "e", 10, "Time before HTTP request expiration in seconds")
 	flag.BoolVar(&quiet, "q", false, "When set to true, only show HTTP 200")
+	flag.BoolVar(&csv, "csv", false, "When set to true, write a csv file with the results")
 	flag.BoolVar(&clear, "c", false, "Clears terminal at startup (Only for Linux)")
 	flag.BoolVar(&help, "h", false, "Display this help")
 
@@ -25,9 +27,10 @@ func FlagsManager() (d, t string, w, e int, q bool) {
 
 	targetURL = targetURLBuilder(targetURL)
 
-	return wordList, targetURL, workers, expiration, quiet
+	return wordList, targetURL, workers, expiration, quiet, csv
 }
 
+// Checks that all flags have a plausible value
 func flagsCheck(help, clear bool, wordList, targetURL string, workers, expiration int) {
 	if help {
 		helpDisp()
@@ -64,6 +67,7 @@ func flagsCheck(help, clear bool, wordList, targetURL string, workers, expiratio
 	}
 }
 
+// Checks and rebuilds the given target URL if needed
 func targetURLBuilder(oldTargetURL string) (newTargetURL string) {
 	var httpTargetURL string
 

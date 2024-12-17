@@ -5,13 +5,18 @@ import (
 	"fmt"
 )
 
+// Timer object to handle time counter
+var timer Timer
+
+// Variables for color display
 var (
 	red   = "\033[31m"
 	green = "\033[32m"
 	reset = "\033[0m"
 )
 
-func MotdDisp(wordList, targetURL string, workers, expiration int, quiet bool) {
+// Basic display functions
+func MotdDisp(wordList, targetURL string, workers, expiration int, quiet, csv bool) {
 	fmt.Printf("Starting MyGB\n\n")
 	fmt.Println("---")
 	fmt.Println("Target:", targetURL)
@@ -19,16 +24,17 @@ func MotdDisp(wordList, targetURL string, workers, expiration int, quiet bool) {
 	fmt.Println("Workers:", workers)
 	fmt.Printf("Timeout: %ds\n", expiration)
 	fmt.Println("Quiet mode:", quiet)
+	fmt.Println("CSV output:", csv)
 	fmt.Printf("---\n\n")
 }
 
-func StartDisp(t *Timer) {
+func WorkStartDisp() {
 	fmt.Printf("Starting scan...\n\n")
-	t.init()
+	timer.init()
 }
 
-func EndDisp(t *Timer) {
-	fmt.Printf("\nScan done in %s\n", t.getDuration())
+func WorkEndDisp() {
+	fmt.Printf("\nScan done in %s\n", timer.getDuration())
 }
 
 func HTTPDisp(word string, code int) {
@@ -39,17 +45,34 @@ func HTTPDisp(word string, code int) {
 	}
 }
 
-func HTTPErr(word string, err error) {
-	fmt.Printf("Request error /%s: %v\n", word, err)
-}
-
-func ReadingErr(err error) {
-	fmt.Println("File reading error:", err)
-}
-
 func helpDisp() {
 	fmt.Println("Usage of mygb:")
 	flag.PrintDefaults()
+}
+
+// Error display functions
+func HTTPErr(word string, err error) {
+	fmt.Printf("Request error for /%s: %v\n", word, err)
+}
+
+func FileReadErr(err error) {
+	fmt.Println("Error reading file:", err)
+}
+
+func fileOpenErr(err error) {
+	fmt.Println("Error opening file:", err)
+}
+
+func fileCreateErr(err error) {
+	fmt.Println("Error creating file:", err)
+}
+
+func fileWriteErr(err error) {
+	fmt.Println("Error writing file:", err)
+}
+
+func fileFlushErr(err error) {
+	fmt.Println("Error writing buffer:", err)
 }
 
 func noFlagErr() {
@@ -61,17 +84,13 @@ func dtFlagsErr() {
 }
 
 func wordListErr() {
-	fmt.Println("Can't find the specified word list")
+	fmt.Println("Word list not found")
 }
 
 func workersErr() {
-	fmt.Println("Can't work with 0 workers (Use -h for help)")
+	fmt.Println("Workers number too low (Use -h for help)")
 }
 
 func expirationErr() {
 	fmt.Println("Expiration time too short (Use -h for help)")
-}
-
-func fileOpenerErr(err error) {
-	fmt.Println("Error opening file:", err)
 }

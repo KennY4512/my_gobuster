@@ -4,15 +4,20 @@ import (
 	"LANG_KENNY_GO25/basics"
 )
 
+// Call the main functions that allow the program to work
 func Execute() {
-	wordList, targetURL, workers, expiration, quiet := basics.FlagsManager()
+	// Gets the flags
+	wordList, targetURL, workers, expiration, quiet, csv := basics.FlagsManager()
 
-	basics.MotdDisp(wordList, targetURL, workers, expiration, quiet)
+	// Displays parameters
+	basics.MotdDisp(wordList, targetURL, workers, expiration, quiet, csv)
 
-	var t basics.Timer
-	basics.StartDisp(&t)
+	// Shows that the work begins
+	basics.WorkStartDisp()
 
-	Worker(wordList, targetURL, workers, expiration, quiet)
+	// Does the work
+	worker(wordList, targetURL, workers, expiration, quiet, csv)
 
-	basics.EndDisp(&t)
+	// Shows that the work is finished
+	basics.WorkEndDisp()
 }
