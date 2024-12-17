@@ -47,7 +47,7 @@ type CSV struct {
 }
 
 func (c *CSV) Add(word string, httpCode int) {
-	c.dataSlice = append(c.dataSlice, "\""+word+","+fmt.Sprintf("%d", httpCode)+"\"") // Format the line before adding it to a temporary slice
+	c.dataSlice = append(c.dataSlice, word+","+fmt.Sprintf("%d", httpCode)) // Format the line before adding it to a temporary slice
 }
 
 func (c *CSV) Write() {
@@ -64,7 +64,7 @@ func (c *CSV) Write() {
 	writer := bufio.NewWriter(file)
 
 	// Adds CSV header to the buffer
-	_, err = writer.WriteString("\"word,httpcode\"\n")
+	_, err = writer.WriteString("word,httpcode\n")
 	if err != nil {
 		fileWriteErr(err)
 		return

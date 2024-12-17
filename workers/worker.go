@@ -26,7 +26,7 @@ func worker(wordList, targetURL string, workers, expiration int, quiet, csv bool
 
 	// Loop through each line in the word list
 	for scanner.Scan() {
-		curWord := scanner.Text()
+		curentWord := scanner.Text()
 		wg.Add(1)
 		sem <- struct{}{} // Acquire a semaphore slot
 
@@ -52,7 +52,7 @@ func worker(wordList, targetURL string, workers, expiration int, quiet, csv bool
 				c.Add(word, resp.StatusCode)
 			}
 
-		}(curWord) // Pass the current word to the goroutine
+		}(curentWord) // Pass the current word to the goroutine
 	}
 
 	// Check for any errors encountered while scanning the file

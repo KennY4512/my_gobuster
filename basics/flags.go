@@ -18,7 +18,7 @@ func FlagsManager() (d, t string, w, e int, q, csv bool) {
 	flag.IntVar(&expiration, "e", 10, "Time before HTTP request expiration in seconds")
 	flag.BoolVar(&quiet, "q", false, "When set to true, only show HTTP 200")
 	flag.BoolVar(&csv, "csv", false, "When set to true, write a csv file with the results")
-	flag.BoolVar(&clear, "c", false, "Clears terminal at startup (Only for Linux)")
+	flag.BoolVar(&clear, "c", false, "Clears terminal at startup")
 	flag.BoolVar(&help, "h", false, "Display this help")
 
 	flag.Parse()
