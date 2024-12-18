@@ -9,20 +9,20 @@ import (
 )
 
 // Function that pperforms the work
-func worker(wordList, targetURL string, workers, expiration int, quiet, csv bool) {
+func worker(f basics.Flags) {
 	var wg sync.WaitGroup
 	var c basics.CSV // CSV object to handle CSV creation if needed
 
 	// Defines the timeout for HTTP client
 	client := &http.Client{
-		Timeout: time.Duration(expiration) * time.Second,
+		Timeout: time.Duration(f.Expiration) * time.Second,
 	}
 
 	// Semaphore to limit the number of concurrent workers
-	sem := make(chan struct{}, workers)
+	sem := make(chan struct{}, f.Workers)
 
 	// Initalize a scanner with the wordlist
-	scanner := bufio.NewScanner(basics.FileOpener(wordList))
+	scanner := bufio.NewScanner(basics.FileOpener(f.WordList))
 
 	// Loop through each line in the word list
 	for scanner.Scan() {
@@ -36,7 +36,7 @@ func worker(wordList, targetURL string, workers, expiration int, quiet, csv bool
 			defer func() { <-sem }() // Release the semaphore slot
 
 			// Send a GET request to the target URL
-			resp, err := client.Get(targetURL + word)
+			resp, err := client.Get(f.TargetURL + word)
 			if err != nil {
 				basics.HTTPErr(word, err)
 				return
@@ -44,10 +44,10 @@ func worker(wordList, targetURL string, workers, expiration int, quiet, csv bool
 			defer resp.Body.Close()
 
 			// Controls how the result is displayed and put the result in a slice (for CSV)
-			if quiet && resp.StatusCode == 200 {
+			if f.Quiet && resp.StatusCode == 200 {
 				basics.HTTPDisp(word, resp.StatusCode)
 				c.Add(word, resp.StatusCode)
-			} else if !quiet {
+			} else if !f.Quiet {
 				basics.HTTPDisp(word, resp.StatusCode)
 				c.Add(word, resp.StatusCode)
 			}
@@ -63,7 +63,7 @@ func worker(wordList, targetURL string, workers, expiration int, quiet, csv bool
 	wg.Wait()
 
 	// If the csv flag is true, write the results to a CSV file
-	if csv {
+	if f.Csv {
 		c.Write()
 	}
 }

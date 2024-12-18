@@ -26,19 +26,24 @@ func FileOpener(wordList string) (file *os.File) {
 	return file
 }
 
+// Structure implementing flags
+type Flags struct {
+	WordList, TargetURL string
+	Workers, Expiration int
+	Quiet, Csv          bool
+}
+
 // Structure implementing a timer
 type Timer struct {
 	initTime time.Time
-	duration time.Duration
 }
 
 func (timer *Timer) init() {
 	timer.initTime = time.Now()
 }
 
-func (timer *Timer) getDuration() time.Duration {
-	timer.duration = time.Since(timer.initTime).Round(time.Millisecond)
-	return timer.duration
+func (timer Timer) getDuration() time.Duration {
+	return time.Since(timer.initTime).Round(time.Millisecond)
 }
 
 // Structure implementing a CSV file creator
@@ -50,7 +55,7 @@ func (c *CSV) Add(word string, httpCode int) {
 	c.dataSlice = append(c.dataSlice, word+","+fmt.Sprintf("%d", httpCode)) // Format the line before adding it to a temporary slice
 }
 
-func (c *CSV) Write() {
+func (c CSV) Write() {
 
 	// Creates a CSV file whose name is the current timestamp
 	file, err := os.Create("mygb_" + time.Now().Format("20060102_150405") + ".csv")

@@ -7,16 +7,16 @@ import (
 // Call the main functions that allow the program to work
 func Execute() {
 	// Gets the flags
-	wordList, targetURL, workers, expiration, quiet, csv := basics.FlagsManager()
+	f := basics.FlagsManager()
 
 	// Displays parameters
-	basics.MotdDisp(wordList, targetURL, workers, expiration, quiet, csv)
+	basics.MotdDisp(f)
 
 	// Shows that the work begins
 	basics.WorkStartDisp()
 
 	// Does the work
-	worker(wordList, targetURL, workers, expiration, quiet, csv)
+	worker(f)
 
 	// Shows that the work is finished
 	basics.WorkEndDisp()

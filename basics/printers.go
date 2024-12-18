@@ -16,15 +16,15 @@ var (
 )
 
 // Basic display functions
-func MotdDisp(wordList, targetURL string, workers, expiration int, quiet, csv bool) {
+func MotdDisp(f Flags) {
 	fmt.Printf("Starting MyGB\n\n")
 	fmt.Println("---")
-	fmt.Println("Target:", targetURL)
-	fmt.Println("List:", wordList)
-	fmt.Println("Workers:", workers)
-	fmt.Printf("Timeout: %ds\n", expiration)
-	fmt.Println("Quiet mode:", quiet)
-	fmt.Println("CSV output:", csv)
+	fmt.Println("Target:", f.TargetURL)
+	fmt.Println("List:", f.WordList)
+	fmt.Println("Workers:", f.Workers)
+	fmt.Printf("Timeout: %ds\n", f.Expiration)
+	fmt.Println("Quiet mode:", f.Quiet)
+	fmt.Println("CSV output:", f.Csv)
 	fmt.Printf("---\n\n")
 }
 

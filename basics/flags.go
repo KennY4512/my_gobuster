@@ -7,10 +7,10 @@ import (
 )
 
 // Handles flags
-func FlagsManager() (d, t string, w, e int, q, csv bool) {
+func FlagsManager() Flags {
 	var wordList, targetURL string
 	var workers, expiration int
-	var quiet, help, clear bool
+	var quiet, csv, help, clear bool
 
 	flag.StringVar(&wordList, "d", "", "Path to dictionnary file (required)")
 	flag.StringVar(&targetURL, "t", "", "Target to enumerate (required)")
@@ -27,7 +27,16 @@ func FlagsManager() (d, t string, w, e int, q, csv bool) {
 
 	targetURL = targetURLBuilder(targetURL)
 
-	return wordList, targetURL, workers, expiration, quiet, csv
+	f := Flags{
+		WordList:   wordList,
+		TargetURL:  targetURL,
+		Workers:    workers,
+		Expiration: expiration,
+		Quiet:      quiet,
+		Csv:        csv,
+	}
+
+	return f
 }
 
 // Checks that all flags have a plausible value
