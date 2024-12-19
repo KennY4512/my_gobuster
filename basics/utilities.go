@@ -8,24 +8,6 @@ import (
 	"time"
 )
 
-// Clears the terminal
-func clearTerm() {
-	cmd := exec.Command("clear")
-	cmd.Stdout = os.Stdout
-	cmd.Run()
-}
-
-// Opens a given file correctly
-func FileOpener(wordList string) (file *os.File) {
-	file, err := os.Open(wordList)
-	if err != nil {
-		fileOpenErr(err)
-		defer file.Close()
-		os.Exit(1)
-	}
-	return file
-}
-
 // Structure implementing flags
 type Flags struct {
 	WordList, TargetURL string
@@ -90,4 +72,22 @@ func (c CSV) Write() {
 		fileFlushErr(err)
 		return
 	}
+}
+
+// Clears the terminal
+func clearTerm() {
+	cmd := exec.Command("clear")
+	cmd.Stdout = os.Stdout
+	cmd.Run()
+}
+
+// Opens a given file correctly
+func FileOpener(wordList string) (file *os.File) {
+	file, err := os.Open(wordList)
+	if err != nil {
+		fileOpenErr(err)
+		defer file.Close()
+		os.Exit(1)
+	}
+	return file
 }
